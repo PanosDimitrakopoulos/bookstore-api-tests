@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Author",
+  "type": "object",
+  "required": ["id", "idBook", "firstName", "lastName"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "integer" },
+    "idBook": { "type": "integer" },
+    "firstName": { "type": ["string", "null"] },
+    "lastName": { "type": ["string", "null"] }
+  }
+}

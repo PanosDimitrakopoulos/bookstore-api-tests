@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Known API defects (expected failures)",
+    "matchedStatuses": ["failed"],
+    "messageRegex": "(?s).*KNOWN DEFECT.*"
+  },
+  {
+    "name": "Connectivity / environment issues",
+    "matchedStatuses": ["broken"],
+    "traceRegex": "(?s).*(ConnectException|SocketTimeoutException|UnknownHostException|ConnectTimeoutException|NoHttpResponseException).*"
+  },
+  {
+    "name": "Unexpected API failures",
+    "matchedStatuses": ["failed"]
+  },
+  {
+    "name": "Test code errors",
+    "matchedStatuses": ["broken"]
+  }
+]
