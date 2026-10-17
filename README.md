@@ -9,7 +9,7 @@ produces Allure reports and runs in GitHub Actions.
 | Language | Java 17 |
 | Build | Maven |
 | HTTP client | REST Assured 5 |
-| Test runner | JUnit 5 (parameterized tests, tags, parallel classes) |
+| Test runner | JUnit 5 (parameterized tests, tags, optional parallel classes) |
 | Assertions | AssertJ + custom fluent `ResponseAssert` |
 | Contract checks | JSON Schema (REST Assured `json-schema-validator`) |
 | Test data | Datafaker (randomized, realistic payloads) |
@@ -23,7 +23,7 @@ produces Allure reports and runs in GitHub Actions.
 **Prerequisites:** JDK 17+, Maven 3.9+. Node.js 18+ is only needed to build the Allure report locally.
 
 ```bash
-git clone <this-repo-url>
+git clone https://github.com/PanosDimitrakopoulos/bookstore-api-tests.git
 cd bookstore-api-tests
 
 # Run the regression suite (everything except tests that document known API defects)
@@ -32,6 +32,15 @@ mvn test
 # Open the Allure report in your browser
 npx allure-commandline@2.46.1 serve target/allure-results
 ```
+
+A successful run ends with:
+
+```
+[INFO] Tests run: 82, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+```
+
+The tests call the public demo API, so an internet connection is required.
 
 ---
 
@@ -78,7 +87,8 @@ input and assert the expected result, without building HTTP requests themselves.
   `Object` so negative tests can send `"abc"` as an id or a map with a wrongly typed field.
 - **Immutable models.** `Book` and `Author` are records with `withX` methods, so a boundary case is one line:
   `validBook().withPageCount(0)`.
-- **No shared state between tests.** Every test builds its own data, so test classes run in parallel safely.
+- **No shared state between tests.** Every test builds its own data, so test classes can run in parallel safely.
+  Parallel execution is off by default to go easy on the shared demo host; see [Running tests](#running-tests).
 - **Readable failures.** Status-code failures include the response body, and every request/response is attached
   to the Allure report, so a failure can be triaged from the report without re-running anything.
 
@@ -97,6 +107,7 @@ input and assert the expected result, without building HTTP requests themselves.
 | One class | `mvn test -Dtest=CreateBookTest` |
 | One method | `mvn test -Dtest=CreateBookTest#createsBook` |
 | Retry failures once (flaky network) | `mvn test -Dsurefire.rerunFailingTestsCount=1` |
+| Run test classes in parallel (4 threads) | `mvn test -Djunit.jupiter.execution.parallel.enabled=true` |
 
 ### Configuration
 
@@ -104,7 +115,10 @@ Defaults live in `src/main/resources/config.properties`. Any value can be overri
 The first match wins:
 
 1. JVM system property: `mvn test -Dapi.base.url=https://staging.example.com`
-2. Environment variable (upper case, dots → underscores): `API_BASE_URL=https://staging.example.com mvn test`
+2. Environment variable (upper case, dots → underscores):
+   - bash / zsh: `API_BASE_URL=https://staging.example.com mvn test`
+   - PowerShell: `$env:API_BASE_URL="https://staging.example.com"; mvn test`
+   - cmd: `set "API_BASE_URL=https://staging.example.com" && mvn test`
 3. `config.properties`
 
 | Key | Default | Purpose |
